@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  fastapi-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    command: api
+    env_file:
+      - .env
+    networks:
+      - genai-net
+
+  socket-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "12345:12345"
+
+    command: socket
+    env_file:
+      - .env
+    networks:
+      - genai-net
+
+  streamlit-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+
+    command: front
+    env_file:
+      - .env
+    networks:
+      - genai-net
+
+networks:
+  genai-net:
+    driver: bridge
