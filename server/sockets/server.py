@@ -39,6 +39,7 @@ class ChatServer:
         while True:
             try:
                 message = client_socket.recv(1024).decode()
+                logging.info(message)
                 if not message:
                     break
                 self.broadcast(username, message)
@@ -46,6 +47,10 @@ class ChatServer:
             except ConnectionError as e:
                 logging.info(e)
                 break
+
+        del self.sessions[username]
+        client_socket.close()
+        logging.info(f"User '{username}' disconnected")
 
     def broadcast(self, sender, message):
         chatbot_controller = ChatBotController()
@@ -56,7 +61,6 @@ class ChatServer:
                 try:
                     bot_response = chatbot_controller.query(message)
                     user_socket.sendall(f"bot_response: {bot_response}".encode())
-                    logging.info("Message sent")
                 except ConnectionError:
                     del self.sessions[username]
                     logging.info(f"User '{username}' disconnected unexpectedly")
